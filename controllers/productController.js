@@ -71,3 +71,26 @@ exports.deleteProductById = (req, res) => {
     });
   }
 };
+
+exports.replaceProductById = (req, res) => {
+  const products = JSON.parse(
+    fs.readFileSync(`${__dirname}/../data/products.json`)
+  );
+  
+  const foundProduct = products.find((p) => p.id == req.params.id);
+
+  if (foundProduct) {
+    products[products.indexOf(foundProduct)]=req.body;
+    fs.writeFileSync(`${__dirname}/../data/products.json`, JSON.stringify(products));
+    res.status(200).json({
+      status: "replacement success",
+      data: {
+        product: foundProduct,
+      },
+    });
+  } else {
+    res.status(404).json({
+      status: "not found",
+    });
+  }
+};
