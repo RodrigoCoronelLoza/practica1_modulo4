@@ -20,7 +20,7 @@ exports.addProduct = (req, res) => {
     fs.readFileSync(`${__dirname}/../data/products.json`)
   );
   products.push(req.body);
-  fs.writeFileSync(`${__dirname}/data/products.json`, JSON.stringify(products));
+  fs.writeFileSync(`${__dirname}/../data/products.json`, JSON.stringify(products));
 
   res.status(200).json({
     status: "success",
