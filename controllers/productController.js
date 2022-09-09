@@ -1,9 +1,8 @@
 const fs = require("fs");
+const { Product } = require("../models");
 
-exports.getAllProducts = (req, res) => {
-  const products = JSON.parse(
-    fs.readFileSync(`${__dirname}/../data/products.json`)
-  );
+exports.getAllProducts = async (req, res) => {
+  const products = await Product.findAll();
 
   res.status(200).json({
     status: "success",
@@ -15,27 +14,20 @@ exports.getAllProducts = (req, res) => {
   });
 };
 
-exports.addProduct = (req, res) => {
-  const products = JSON.parse(
-    fs.readFileSync(`${__dirname}/../data/products.json`)
-  );
-  products.push(req.body);
-  fs.writeFileSync(`${__dirname}/../data/products.json`, JSON.stringify(products));
+exports.addProduct = async (req, res) => {
+  let newProduct = Product.build(req.body);
+  newProduct = await newProduct.save();
 
   res.status(200).json({
     status: "success",
     data: {
-      products,
+      product: newProduct,
     },
   });
 };
 
-exports.getProductById = (req, res) => {
-  const products = JSON.parse(
-    fs.readFileSync(`${__dirname}/../data/products.json`)
-  );
-
-  const foundProduct = products.find((p) => p.id == req.params.id);
+exports.getProductById = async (req, res) => {
+  const foundProduct = await Product.findByPk(req.params.id);
   if (foundProduct) {
     res.status(200).json({
       status: "success",
@@ -57,8 +49,11 @@ exports.deleteProductById = (req, res) => {
 
   const foundProduct = products.find((p) => p.id == req.params.id);
   if (foundProduct) {
-    products.splice(products.indexOf(foundProduct),1);
-    fs.writeFileSync(`${__dirname}/../data/products.json`, JSON.stringify(products));
+    products.splice(products.indexOf(foundProduct), 1);
+    fs.writeFileSync(
+      `${__dirname}/../data/products.json`,
+      JSON.stringify(products)
+    );
     res.status(200).json({
       status: "delete success",
       data: {
@@ -76,12 +71,15 @@ exports.replaceProductById = (req, res) => {
   const products = JSON.parse(
     fs.readFileSync(`${__dirname}/../data/products.json`)
   );
-  
+
   const foundProduct = products.find((p) => p.id == req.params.id);
 
   if (foundProduct) {
-    products[products.indexOf(foundProduct)]=req.body;
-    fs.writeFileSync(`${__dirname}/../data/products.json`, JSON.stringify(products));
+    products[products.indexOf(foundProduct)] = req.body;
+    fs.writeFileSync(
+      `${__dirname}/../data/products.json`,
+      JSON.stringify(products)
+    );
     res.status(200).json({
       status: "replacement success",
       data: {
